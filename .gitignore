@@ -1,0 +1,13 @@
+# Python environment
+venv/
+env/
+.env
+
+# Python internals
+__pycache__/
+*.pyc
+
+# Distribution / Build
+dist/
+build/
+*.egg-info
