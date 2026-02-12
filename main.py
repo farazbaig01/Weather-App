@@ -16,6 +16,9 @@ class WeatherResponse(BaseModel):
     temperature: float
     description: str
     recommendation: str
+    feels_like: float = None  # Optional field for "feels like" temperature
+    humidity: int = None  # Optional field for humidity percentage
+    wind_speed: float = None  # Optional field for wind speed in kph
 
 def get_advice(temperature: float) -> str:
     if temperature < 0:
@@ -47,10 +50,16 @@ async def fetch_weather(city: str):
     temperature = data["current"]["temp_c"]
     description = data["current"]["condition"]["text"]
     recommendation = get_advice(temperature)
+    feels_like = data["current"]["feelslike_c"]
+    humidity = data["current"]["humidity"]
+    wind_speed = data["current"]["wind_kph"]
 
     return WeatherResponse(
         city=data["location"]["name"],
         temperature=temperature,
         description=description,
-        recommendation=recommendation
+        recommendation=recommendation,
+        feels_like=feels_like,
+        humidity=humidity,
+        wind_speed=wind_speed
     )
