@@ -1,4 +1,5 @@
 import os
+from urllib import response
 from fastapi import FastAPI, HTTPException
 import httpx
 from pydantic import BaseModel
@@ -41,12 +42,14 @@ async def fetch_weather(city: str):
             detail=f"WeatherAPI Error: {response.text}"
         )
     data = response.json()
-    temperature = data["main"]["temp"]
-    description = data["weather"][0]["description"]
+    
+    # Updated mapping for WeatherAPI.com structure
+    temperature = data["current"]["temp_c"]
+    description = data["current"]["condition"]["text"]
     recommendation = get_advice(temperature)
 
     return WeatherResponse(
-        city=city.capitalize(),
+        city=data["location"]["name"],
         temperature=temperature,
         description=description,
         recommendation=recommendation
