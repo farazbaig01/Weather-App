@@ -27,16 +27,17 @@ def get_advice(temperature: float) -> str:
     else:
         return "It's hot! Stay hydrated and wear light clothing."
 
-@app.get("/weather/{city}", response_model=WeatherResponse)
-async def get_weather(city: str):
-    import requests
-
-    url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={API_KEY}&units=metric"
-    response = requests.get(url)
-
+async def fetch_weather(city: str):
+    url = f"http://api.weatherapi.com/v1/current.json?key={API_KEY}&q={city}&aqi=no"
+    
+    async with httpx.AsyncClient() as client:
+        response = await client.get(url)
+        
     if response.status_code != 200:
-        raise HTTPException(status_code=404, detail="City not found")
-
+        raise HTTPException(
+            status_code=response.status_code, 
+            detail=f"WeatherAPI Error: {response.text}"
+        )
     data = response.json()
     temperature = data["main"]["temp"]
     description = data["weather"][0]["description"]
