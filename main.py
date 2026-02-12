@@ -1,5 +1,6 @@
 import os
 from fastapi import FastAPI, HTTPException
+import httpx
 from pydantic import BaseModel
 from dotenv import load_dotenv
 
@@ -27,6 +28,7 @@ def get_advice(temperature: float) -> str:
     else:
         return "It's hot! Stay hydrated and wear light clothing."
 
+@app.get("/weather/{city}", response_model=WeatherResponse)
 async def fetch_weather(city: str):
     url = f"http://api.weatherapi.com/v1/current.json?key={API_KEY}&q={city}&aqi=no"
     
