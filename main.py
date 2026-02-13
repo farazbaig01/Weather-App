@@ -1,6 +1,8 @@
 import os
 from urllib import response
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
 import httpx
 from pydantic import BaseModel
 from dotenv import load_dotenv
@@ -9,6 +11,8 @@ load_dotenv()
 
 app = FastAPI()
 
+templates = Jinja2Templates(directory="templates")
+
 API_KEY = os.getenv("WEATHER_API_KEY")
 
 class WeatherResponse(BaseModel):
@@ -16,9 +20,9 @@ class WeatherResponse(BaseModel):
     temperature: float
     description: str
     recommendation: str
-    feels_like: float = None  # Optional field for "feels like" temperature
-    humidity: int = None  # Optional field for humidity percentage
-    wind_speed: float = None  # Optional field for wind speed in kph
+    feels_like: float = None 
+    humidity: int = None  
+    wind_speed: float = None  
 
 def get_advice(temperature: float) -> str:
     if temperature < 0:
@@ -31,6 +35,11 @@ def get_advice(temperature: float) -> str:
         return "It's warm. Dress comfortably, maybe in short sleeves."
     else:
         return "It's hot! Stay hydrated and wear light clothing."
+
+@app.get("/", response_class=HTMLResponse)
+async def root(request : Request):
+    return templates.TemplateResponse("index.html", {"request": request})
+
 
 @app.get("/weather/{city}", response_model=WeatherResponse)
 async def fetch_weather(city: str):
